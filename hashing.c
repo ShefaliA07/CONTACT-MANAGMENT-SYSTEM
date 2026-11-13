@@ -12,6 +12,7 @@ struct Contact {
 
 struct Contact table[SIZE];
 int collisions = 0;
+int comparisons = 0;
 
 int hashFunction(int id) {
     return id % 10;
@@ -21,10 +22,8 @@ void insert(int id, char name[], char phone[]) {
     int index = hashFunction(id);
 
     while (table[index].occupied) {
-        if (table[index].id == id) {
-            printf("Duplicate ID: %d\n", id);
+        if (table[index].id == id)
             return;
-        }
 
         collisions++;
         index = (index + 1) % SIZE;
@@ -36,18 +35,15 @@ void insert(int id, char name[], char phone[]) {
     table[index].occupied = 1;
 }
 
-void search(int id) {
+struct Contact* search(int id) {
     int index = hashFunction(id);
     int start = index;
 
     while (table[index].occupied) {
-        if (table[index].id == id) {
-            printf("Contact found!\n");
-            printf("ID: %d\n", table[index].id);
-            printf("Name: %s\n", table[index].name);
-            printf("Phone: %s\n", table[index].phone);
-            return;
-        }
+        comparisons++;
+
+        if (table[index].id == id)
+            return &table[index];
 
         index = (index + 1) % SIZE;
 
@@ -55,11 +51,11 @@ void search(int id) {
             break;
     }
 
-    printf("Contact not found!\n");
+    return NULL;
 }
 
 void display() {
-    printf("\nAll Contacts:\n");
+    printf("\nAll 30 Contacts:\n");
 
     for (int i = 0; i < SIZE; i++) {
         if (table[i].occupied) {
@@ -72,24 +68,44 @@ void display() {
 }
 
 int main() {
+    char *names[] = {
+        "Arun", "Bala", "Charan", "Deepak", "Divya",
+        "Eswar", "Farah", "Gokul", "Hari", "Ishita",
+        "Jai", "Kavin", "Lakshmi", "Manoj", "Nisha",
+        "Omkar", "Priya", "Rahul", "Sneha", "Tarun",
+        "Uma", "Varun", "Wafa", "Xavier", "Yasmin",
+        "Zoya", "Adithya", "Bhavana", "Chitra", "Dinesh"
+    };
+
     for (int i = 0; i < SIZE; i++)
         table[i].occupied = 0;
 
-    insert(101, "Arun", "9876543210");
-    insert(102, "Bala", "9876543211");
-    insert(103, "Charan", "9876543212");
-    insert(104, "Deepak", "9876543213");
-    insert(105, "Divya", "9876543214");
+    for (int i = 0; i < 30; i++) {
+        char phone[15];
+        sprintf(phone, "98765432%02d", 10 + i);
+
+        insert(101 + i, names[i], phone);
+    }
 
     printf("CONTACT MANAGEMENT SYSTEM - HASHING\n");
 
     display();
 
-    printf("\nSearching for Contact ID 103:\n");
-    search(103);
+    comparisons = 0;
+    struct Contact* found = search(115);
 
-    printf("\nSearching for Contact ID 999:\n");
-    search(999);
+    printf("\nSearching ID 115: %s\n",
+           found ? "Found" : "Not Found");
+    printf("Successful search comparisons: %d\n",
+           comparisons);
+
+    comparisons = 0;
+    found = search(999);
+
+    printf("\nSearching ID 999: %s\n",
+           found ? "Found" : "Not Found");
+    printf("Unsuccessful search comparisons: %d\n",
+           comparisons);
 
     printf("\nTotal Collisions: %d\n", collisions);
 
