@@ -1,55 +1,53 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 struct Contact {
     int id;
-    char name[50];
-    char phone[15];
-    struct Contact *left, *right;
+    char name[50], phone[15];
     int height;
+    struct Contact *left, *right;
 };
+
+int comparisons = 0;
 
 int max(int a, int b) {
     return (a > b) ? a : b;
 }
 
-int getHeight(struct Contact* node) {
-    if (node == NULL)
-        return 0;
-    return node->height;
+int getHeight(struct Contact* n) {
+    return n == NULL ? 0 : n->height;
 }
 
-struct Contact* createContact(int id, char name[], char phone[]) {
-    struct Contact* node =
-        (struct Contact*)malloc(sizeof(struct Contact));
+struct Contact* create(int id, char name[], char phone[]) {
+    struct Contact* n = malloc(sizeof(struct Contact));
 
-    node->id = id;
-    strcpy(node->name, name);
-    strcpy(node->phone, phone);
-    node->left = NULL;
-    node->right = NULL;
-    node->height = 1;
+    n->id = id;
+    strcpy(n->name, name);
+    strcpy(n->phone, phone);
+    n->height = 1;
+    n->left = n->right = NULL;
 
-    return node;
+    return n;
 }
 
-int getBalance(struct Contact* node) {
-    if (node == NULL)
+int getBalance(struct Contact* n) {
+    if (n == NULL)
         return 0;
-    return getHeight(node->left) - getHeight(node->right);
+
+    return getHeight(n->left) - getHeight(n->right);
 }
 
 struct Contact* rightRotate(struct Contact* y) {
     struct Contact* x = y->left;
-    struct Contact* temp = x->right;
+    struct Contact* t = x->right;
 
     x->right = y;
-    y->left = temp;
+    y->left = t;
 
     y->height = 1 + max(getHeight(y->left),
                         getHeight(y->right));
+
     x->height = 1 + max(getHeight(x->left),
                         getHeight(x->right));
 
@@ -58,13 +56,14 @@ struct Contact* rightRotate(struct Contact* y) {
 
 struct Contact* leftRotate(struct Contact* x) {
     struct Contact* y = x->right;
-    struct Contact* temp = y->left;
+    struct Contact* t = y->left;
 
     y->left = x;
-    x->right = temp;
+    x->right = t;
 
     x->height = 1 + max(getHeight(x->left),
                         getHeight(x->right));
+
     y->height = 1 + max(getHeight(y->left),
                         getHeight(y->right));
 
@@ -74,7 +73,7 @@ struct Contact* leftRotate(struct Contact* x) {
 struct Contact* insert(struct Contact* node,
                        int id, char name[], char phone[]) {
     if (node == NULL)
-        return createContact(id, name, phone);
+        return create(id, name, phone);
 
     if (id < node->id)
         node->left = insert(node->left, id, name, phone);
@@ -107,29 +106,29 @@ struct Contact* insert(struct Contact* node,
     return node;
 }
 
-void search(struct Contact* root, int id) {
-    if (root == NULL) {
-        printf("Contact not found!\n");
-        return;
+struct Contact* search(struct Contact* root, int id) {
+    while (root != NULL) {
+        comparisons++;
+
+        if (id == root->id)
+            return root;
+
+        if (id < root->id)
+            root = root->left;
+        else
+            root = root->right;
     }
 
-    if (id == root->id) {
-        printf("Contact found!\n");
-        printf("ID: %d\n", root->id);
-        printf("Name: %s\n", root->name);
-        printf("Phone: %s\n", root->phone);
-    } else if (id < root->id) {
-        search(root->left, id);
-    } else {
-        search(root->right, id);
-    }
+    return NULL;
 }
 
 void display(struct Contact* root) {
     if (root != NULL) {
         display(root->left);
+
         printf("%d  %s  %s\n",
                root->id, root->name, root->phone);
+
         display(root->right);
     }
 }
@@ -137,19 +136,41 @@ void display(struct Contact* root) {
 int main() {
     struct Contact* root = NULL;
 
-    root = insert(root, 101, "Arun", "9876543210");
-    root = insert(root, 102, "Bala", "9876543211");
-    root = insert(root, 103, "Charan", "9876543212");
-    root = insert(root, 104, "Deepak", "9876543213");
-    root = insert(root, 105, "Divya", "9876543214");
+    char *names[] = {
+        "Arun", "Bala", "Charan", "Deepak", "Divya",
+        "Eswar", "Farah", "Gokul", "Hari", "Ishita",
+        "Jai", "Kavin", "Lakshmi", "Manoj", "Nisha",
+        "Omkar", "Priya", "Rahul", "Sneha", "Tarun",
+        "Uma", "Varun", "Wafa", "Xavier", "Yasmin",
+        "Zoya", "Adithya", "Bhavana", "Chitra", "Dinesh"
+    };
+
+    for (int i = 0; i < 30; i++) {
+        char phone[15];
+        sprintf(phone, "98765432%02d", 10 + i);
+
+        root = insert(root, 101 + i, names[i], phone);
+    }
 
     printf("CONTACT MANAGEMENT SYSTEM - AVL\n");
-
-    printf("\nAll Contacts:\n");
+    printf("\nAll 30 Contacts:\n");
     display(root);
 
-    printf("\nSearching for Contact ID 103:\n");
-    search(root, 103);
+    comparisons = 0;
+    struct Contact* found = search(root, 115);
+
+    printf("\nSearching ID 115: %s\n",
+           found ? "Found" : "Not Found");
+    printf("Successful search comparisons: %d\n",
+           comparisons);
+
+    comparisons = 0;
+    found = search(root, 999);
+
+    printf("\nSearching ID 999: %s\n",
+           found ? "Found" : "Not Found");
+    printf("Unsuccessful search comparisons: %d\n",
+           comparisons);
 
     printf("\nAVL Tree Height: %d\n", getHeight(root));
 
