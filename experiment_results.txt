@@ -1,1 +1,37 @@
+CONTACT MANAGEMENT SYSTEM
+EXPERIMENT RESULTS
 
+Dataset:
+Total number of contacts: 30
+Contact IDs: 101 to 130
+
+1. BINARY SEARCH TREE (BST)
+Successful search (ID 115): 15 comparisons
+Unsuccessful search (ID 999): 30 comparisons
+Tree Height: 30
+
+2. AVL TREE
+Successful search (ID 115): 5 comparisons
+Unsuccessful search (ID 999): 5 comparisons
+Tree Height: 5
+
+3. HASHING WITH LINEAR PROBING
+Successful search (ID 115): 10 comparisons
+Unsuccessful search (ID 999): 21 comparisons
+Total Collisions: 300
+
+COMPARISON:
+BST has a height of 30 because contacts
+were inserted in ascending order.
+
+AVL balances the tree automatically and
+has a height of only 5.
+
+Hashing uses a hash function and linear
+probing to store and search contacts.
+
+CONCLUSION:
+AVL provides better balanced tree searching
+than BST for this insertion order.
+Hashing provides direct access using a hash
+function, but collisions must be handled.
